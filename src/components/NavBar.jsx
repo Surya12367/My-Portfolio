@@ -1,17 +1,16 @@
 // src/components/Navbar.jsx
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { gsap } from "gsap";
 
 const Navbar = ({
-  logo,
   items = [],
   baseColor = "#fff",
   pillColor = "#060010",
-  hoveredPillTextColor = "#060010",
   pillTextColor,
 }) => {
   const resolvedPillTextColor = pillTextColor ?? baseColor;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
   const pillRefs = useRef([]);
   const topRef = useRef(null);
   const middleRef = useRef(null);
@@ -19,6 +18,7 @@ const Navbar = ({
 
   // Hover animation for pills
   const handleHover = (i) => {
+    if (items[i].href.slice(1) === activeSection) return;
     const pill = pillRefs.current[i];
     if (!pill) return;
     gsap.to(pill, {
@@ -32,6 +32,7 @@ const Navbar = ({
   };
 
   const handleLeave = (i) => {
+    if (items[i].href.slice(1) === activeSection) return;
     const pill = pillRefs.current[i];
     if (!pill) return;
     gsap.to(pill, {
@@ -44,20 +45,19 @@ const Navbar = ({
     });
   };
 
-  // Hamburger animation
+  // Hamburger animation (keep original X style)
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
 
     if (!isMobileMenuOpen) {
-      // Animate to cross
-      gsap.to(topRef.current, { rotation: 45, y: 0, duration: 0.3, ease: "power3.out" });
+      // Open → rotate only
+      gsap.to(topRef.current, { rotation: 45, duration: 0.3, ease: "power3.out" });
       gsap.to(middleRef.current, { opacity: 0, duration: 0.2, ease: "power3.out" });
-      gsap.to(bottomRef.current, { rotation: -45, y: 0, duration: 0.3, ease: "power3.out" });
+      gsap.to(bottomRef.current, { rotation: -45, duration: 0.3, ease: "power3.out" });
     } else {
-      // Animate back to hamburger
+      // Close → reset
       gsap.to(topRef.current, {
         rotation: 0,
-        y: 0,
         duration: 0.3,
         ease: "power3.out",
         onComplete: () => gsap.set(topRef.current, { clearProps: "all" }),
@@ -70,7 +70,6 @@ const Navbar = ({
       });
       gsap.to(bottomRef.current, {
         rotation: 0,
-        y: 0,
         duration: 0.3,
         ease: "power3.out",
         onComplete: () => gsap.set(bottomRef.current, { clearProps: "all" }),
@@ -78,38 +77,64 @@ const Navbar = ({
     }
   };
 
-  return (
-    <div className="absolute top-4 left-0 right-0 z-[1000] flex justify-between items-center px-4 md:px-8">
-      {/* Logo */}
-      <div className="w-10 h-10 rounded-full overflow-hidden cursor-pointer">
-        <img src={logo} alt="Logo" className="w-full h-full object-cover" />
-      </div>
+  // Track active section
+  useEffect(() => {
+    const sections = document.querySelectorAll("section[id]");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let maxRatio = 0;
+        let visibleSection = activeSection;
 
+        entries.forEach((entry) => {
+          if (entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            visibleSection = entry.target.id;
+          }
+        });
+
+        if (visibleSection !== activeSection) {
+          setActiveSection(visibleSection);
+        }
+      },
+      { threshold: Array.from({ length: 101 }, (_, i) => i / 100) }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [activeSection]);
+
+  return (
+    <div className="absolute top-4 left-0 right-0 z-[1000] flex justify-center items-center px-4 md:px-8">
       {/* Desktop Pills */}
       <ul className="hidden md:flex gap-3 items-center">
-        {items.map((item, i) => (
-          <li key={item.href} className="relative h-10">
-            <a
-              href={item.href}
-              ref={(el) => (pillRefs.current[i] = el)}
-              className="relative px-4 h-full flex items-center justify-center rounded-full font-semibold cursor-pointer transition-all"
-              style={{
-                background: pillColor,
-                color: resolvedPillTextColor,
-              }}
-              onMouseEnter={() => handleHover(i)}
-              onMouseLeave={() => handleLeave(i)}
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
+        {items.map((item, i) => {
+          const isActive = activeSection === item.href.slice(1);
+          return (
+            <li key={item.href} className="relative h-10">
+              <a
+                href={item.href}
+                ref={(el) => (pillRefs.current[i] = el)}
+                className="relative px-4 h-full flex items-center justify-center rounded-full font-semibold cursor-pointer transition-all border-2"
+                style={{
+                  background: isActive ? baseColor : pillColor,
+                  color: isActive ? pillColor : resolvedPillTextColor,
+                  transform: isActive ? "translateY(-3px) scale(1.05)" : "none",
+                  borderColor: baseColor,
+                }}
+                onMouseEnter={() => handleHover(i)}
+                onMouseLeave={() => handleLeave(i)}
+              >
+                {item.label}
+              </a>
+            </li>
+          );
+        })}
       </ul>
 
       {/* Mobile Hamburger */}
       <button
         onClick={toggleMobileMenu}
-        className="md:hidden flex flex-col justify-center items-center w-8 h-8 relative"
+        className="md:hidden absolute right-4 flex flex-col justify-center items-center w-8 h-8"
       >
         <span
           ref={topRef}
@@ -132,7 +157,11 @@ const Navbar = ({
             <a
               key={item.href}
               href={item.href}
-              className="block px-4 py-2 rounded text-white font-medium"
+              className={`block px-4 py-2 rounded font-medium border-2 transition ${
+                activeSection === item.href.slice(1)
+                  ? "bg-white text-black border-black"
+                  : "text-white border-white hover:bg-white hover:text-black"
+              }`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {item.label}
