@@ -5,6 +5,7 @@ import { HeroSection } from "./components/HeroSection";
 import Particles from "./bits/Particles";
 import { AboutSection } from "./components/AboutSection";
 import SkillsSection from "./components/SkillsSection";
+import { ProjectsSection } from "./components/ProjectSection";
 
 function App() {
   return (
@@ -50,6 +51,10 @@ function App() {
 
         <section id="skills">
           <SkillsSection/>
+        </section>
+
+        <section id="projects">
+          <ProjectsSection/>
         </section>
       </main>
     </div>
