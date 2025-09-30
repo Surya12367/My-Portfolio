@@ -11,7 +11,7 @@ export const AboutSection = () => {
         {/* Profile Image */}
         <div className="flex-shrink-0">
           <img
-            src="src/assets/portfolio-pic.jpg" 
+            src="/portfolio-pic.jpg" 
             alt="Profile"
             className="w-90 h-90 object-cover rounded-2xl shadow-lg"
           />

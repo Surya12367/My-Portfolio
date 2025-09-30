@@ -8,7 +8,7 @@ const projects = [
     title: "Food-Delivery App",
     description:
       "A fully responsive food delivery platform with cart functionality, product filters, and modern UI.",
-    image: "src/assets/food-del.png",
+    image: "/food-del.png",
     tags: ["React", "Tailwind", "JavaScript"],
     demoUrl: "https://food-del-wheat-one.vercel.app/",
     githubUrl: "https://github.com/Surya12367/food-delivery-app",
@@ -17,7 +17,7 @@ const projects = [
     title: "Weather Application",
     description:
       "A responsive web app that shows real-time weather, including temperature, humidity, and wind speed for any city along with suggestions and map integration.",
-    image: "src/assets/Weather-application.png",
+    image: "/Weather-application.png",
     tags: ["React", "Tailwind", "JavaScript", "Open Weather API"],
     demoUrl: "https://weather-application-with-map.netlify.app/",
     githubUrl: "https://github.com/Surya12367/Weather-application",
@@ -26,7 +26,7 @@ const projects = [
     title: "E-commerce",
     description:
       "A semi functional online shopping platform where users can add items to the cart. Features a responsive UI, product filtering and smooth navigation.",
-    image: "src/assets/E-commerce.png",
+    image: "/E-commerce.png",
     tags: ["HTML", "CSS", "JavaScript"],
     demoUrl: "https://e-commerce-six-amber-30.vercel.app/",
     githubUrl: "https://github.com/Surya12367/E-Commerce",
@@ -35,7 +35,7 @@ const projects = [
     title: "Image-Finder",
     description:
       "A responsive web app that allows users to search and browse high-quality images using keywords. Integrated with a reliable API with dynamic image grids.",
-    image: "src/assets/image-finder.png",
+    image: "/image-finder.png",
     tags: ["React", "Tailwind", "JavaScript", "Unsplash API"],
     demoUrl: "https://68d291ad424e0be4add3f7d1--bejewelled-baklava-89b0cd.netlify.app/",
     githubUrl: "https://github.com/Surya12367/Image-finder",
