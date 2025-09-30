@@ -1,22 +1,83 @@
 // src/components/HeroSection.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, Github, Linkedin, Mail, FileText } from 'lucide-react';
 import SplitText from '../bits/SplitText';
 
 export const HeroSection = () => {
+  const socialLinks = [
+    {
+      icon: <Github size={20} />,
+      href: "https://github.com/surya12367",
+      label: "GitHub",
+      color: "hover:bg-gray-200 hover:text-black"
+    },
+    {
+      icon: <Linkedin size={20} />,
+      href: "https://www.linkedin.com/in/r-surya-prakash-aab7262ba?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+      label: "LinkedIn",
+      color: "hover:bg-blue-500 hover:text-white"
+    },
+    {
+      icon: <Mail size={20} />,
+      href: "#contact",
+      label: "Email",
+      color: "hover:bg-red-500 hover:text-white"
+    },
+    {
+      icon: <FileText size={20} />,
+      href: "#resume",
+      label: "Resume",
+      color: "hover:bg-purple-500 hover:text-white"
+    }
+  ];
+
   return (
     <section
       id="hero"
       className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden text-white"
     >
+      {/* Social Links - Right Side */}
+      <motion.div
+        className="fixed right-8 top-1/2 -translate-y-1/2 z-50 hidden lg:flex flex-col gap-4"
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1.5, duration: 0.8, ease: "easeOut" }}
+      >
+        {socialLinks.map((link, index) => (
+          <motion.a
+            key={link.label}
+            href={link.href}
+            target={link.href.startsWith('http') ? "_blank" : "_self"}
+            rel="noopener noreferrer"
+            className={`w-12 h-12 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 
+                       flex items-center justify-center text-white transition-all duration-300
+                       ${link.color} shadow-lg hover:scale-110 group`}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.5 + index * 0.1, duration: 0.5 }}
+            whileHover={{ scale: 1.1 }}
+            aria-label={link.label}
+          >
+            {link.icon}
+            
+            {/* Tooltip */}
+            <span className="absolute right-16 bg-gray-900 text-white px-3 py-1 rounded-lg text-sm
+                           opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                           whitespace-nowrap pointer-events-none">
+              {link.label}
+            </span>
+          </motion.a>
+        ))}
+      </motion.div>
+
       {/* Hero content */}
       <div className="container max-w-4xl mx-auto text-center z-10">
         <div className="space-y-6">
           {/* Animated heading */}
           <SplitText
             text="Hello, I'm Surya Prakash"
-            className="text-4xl md:text-5xl font-bold text-center"
+            className="text-4xl md:text-5xl font-bold text-center text-white"
             delay={0.05}
             duration={0.6}
             splitType="chars"
@@ -29,13 +90,13 @@ export const HeroSection = () => {
             className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
+            transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
           >
             I build scalable web applications and solve complex problems
             using modern full-stack technologies. Experienced in
-            <span className="font-semibold"> React.js</span> and
-            <span className="font-semibold"> Spring Boot</span>, I focus on
+            <span className="font-semibold text-purple-400"> React.js</span> and
+            <span className="font-semibold text-purple-400"> Spring Boot</span>, I focus on
             delivering efficient, maintainable, and high-quality code.
           </motion.p>
 
@@ -44,36 +105,34 @@ export const HeroSection = () => {
             className="pt-4 flex flex-col md:flex-row gap-4 justify-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.6 }}
+            transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            {/* Existing button */}
             <a
-              href="https://github.com/surya12367"
-              className="px-6 py-3 rounded-lg bg-purple-500 text-black font-semibold hover:bg-purple-400 transition shadow-lg hover:shadow-purple-500/50"
+              href="#projects"
+              className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold hover:from-purple-600 hover:to-indigo-600 transition shadow-lg hover:shadow-purple-500/50"
             >
               Learn More
             </a>
 
-            {/* New button for additional functionality */}
-            <button
-              onClick={() => alert("Add your functionality here")}
-              className="px-6 py-3 rounded-lg bg-transparent border-2 border-purple-500 text-purple-500 font-semibold hover:bg-purple-500 hover:text-black transition shadow-lg hover:shadow-purple-500/50"
+            <a
+              href="#resume"
+              className="px-6 py-3 rounded-lg bg-transparent border-2 border-purple-500 text-purple-500 font-semibold hover:bg-purple-500 hover:text-white transition shadow-lg hover:shadow-purple-500/50"
             >
               View Resume
-            </button>
+            </a>
           </motion.div>
         </div>
       </div>
 
-      {/* Scroll indicator with animated bounce & opacity */}
+      {/* Scroll indicator with soft glow */}
       <motion.div
         className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-10"
-        animate={{ y: [0, 10, 0], opacity: [1, 0.6, 1] }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
+        animate={{ y: [0, 10, 0], opacity: [1, 0.6, 1], scale: [1, 1.1, 1] }}
+        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
       >
         <span className="text-sm text-gray-400 mb-2">Scroll</span>
-        <ArrowDown className="h-5 w-5 text-purple-400" />
+        <ArrowDown className="h-5 w-5 text-purple-400 drop-shadow-lg" />
       </motion.div>
     </section>
   );

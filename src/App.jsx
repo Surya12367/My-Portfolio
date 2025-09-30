@@ -6,6 +6,7 @@ import Particles from "./bits/Particles";
 import { AboutSection } from "./components/AboutSection";
 import SkillsSection from "./components/SkillsSection";
 import { ProjectsSection } from "./components/ProjectSection";
+import ContactSection from "./components/ContactSection";
 
 function App() {
   return (
@@ -55,6 +56,10 @@ function App() {
 
         <section id="projects">
           <ProjectsSection/>
+        </section>
+
+        <section id="contact">
+          <ContactSection/>
         </section>
       </main>
     </div>

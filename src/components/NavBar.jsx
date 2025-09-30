@@ -1,6 +1,5 @@
 // src/components/Navbar.jsx
-import React, { useRef, useState, useEffect } from "react";
-import { gsap } from "gsap";
+import React, { useState, useEffect } from "react";
 
 const Navbar = ({
   items = [],
@@ -11,71 +10,7 @@ const Navbar = ({
   const resolvedPillTextColor = pillTextColor ?? baseColor;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const pillRefs = useRef([]);
-  const topRef = useRef(null);
-  const middleRef = useRef(null);
-  const bottomRef = useRef(null);
-
-  // Hover animation for pills
-  const handleHover = (i) => {
-    if (items[i].href.slice(1) === activeSection) return;
-    const pill = pillRefs.current[i];
-    if (!pill) return;
-    gsap.to(pill, {
-      y: -3,
-      scale: 1.05,
-      backgroundColor: baseColor,
-      color: pillColor,
-      duration: 0.15,
-      ease: "power3.out",
-    });
-  };
-
-  const handleLeave = (i) => {
-    if (items[i].href.slice(1) === activeSection) return;
-    const pill = pillRefs.current[i];
-    if (!pill) return;
-    gsap.to(pill, {
-      y: 0,
-      scale: 1,
-      backgroundColor: pillColor,
-      color: resolvedPillTextColor,
-      duration: 0.15,
-      ease: "power3.out",
-    });
-  };
-
-  // Hamburger animation (keep original X style)
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen((prev) => !prev);
-
-    if (!isMobileMenuOpen) {
-      // Open → rotate only
-      gsap.to(topRef.current, { rotation: 45, duration: 0.3, ease: "power3.out" });
-      gsap.to(middleRef.current, { opacity: 0, duration: 0.2, ease: "power3.out" });
-      gsap.to(bottomRef.current, { rotation: -45, duration: 0.3, ease: "power3.out" });
-    } else {
-      // Close → reset
-      gsap.to(topRef.current, {
-        rotation: 0,
-        duration: 0.3,
-        ease: "power3.out",
-        onComplete: () => gsap.set(topRef.current, { clearProps: "all" }),
-      });
-      gsap.to(middleRef.current, {
-        opacity: 1,
-        duration: 0.2,
-        ease: "power3.out",
-        onComplete: () => gsap.set(middleRef.current, { clearProps: "all" }),
-      });
-      gsap.to(bottomRef.current, {
-        rotation: 0,
-        duration: 0.3,
-        ease: "power3.out",
-        onComplete: () => gsap.set(bottomRef.current, { clearProps: "all" }),
-      });
-    }
-  };
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   // Track active section
   useEffect(() => {
@@ -109,20 +44,21 @@ const Navbar = ({
       <ul className="hidden md:flex gap-3 items-center">
         {items.map((item, i) => {
           const isActive = activeSection === item.href.slice(1);
+          const isHovered = hoveredIndex === i && !isActive;
+
           return (
             <li key={item.href} className="relative h-10">
               <a
                 href={item.href}
-                ref={(el) => (pillRefs.current[i] = el)}
-                className="relative px-4 h-full flex items-center justify-center rounded-full font-semibold cursor-pointer transition-all border-2"
+                className="relative px-4 h-full flex items-center justify-center rounded-full font-semibold cursor-pointer border-2 transition-all duration-200 ease-out"
                 style={{
-                  background: isActive ? baseColor : pillColor,
-                  color: isActive ? pillColor : resolvedPillTextColor,
-                  transform: isActive ? "translateY(-3px) scale(1.05)" : "none",
                   borderColor: baseColor,
+                  backgroundColor: isActive || isHovered ? baseColor : pillColor,
+                  color: isActive || isHovered ? pillColor : resolvedPillTextColor,
+                  transform: isActive || isHovered ? 'translateY(-3px) scale(1.05)' : 'translateY(0) scale(1)',
                 }}
-                onMouseEnter={() => handleHover(i)}
-                onMouseLeave={() => handleLeave(i)}
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
               >
                 {item.label}
               </a>
@@ -133,31 +69,42 @@ const Navbar = ({
 
       {/* Mobile Hamburger */}
       <button
-        onClick={toggleMobileMenu}
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         className="md:hidden absolute right-4 flex flex-col justify-center items-center w-8 h-8"
+        aria-label="Toggle menu"
       >
         <span
-          ref={topRef}
-          className="absolute top-1/2 left-0 w-full h-0.5 bg-white rounded -translate-y-2.5"
+          className="absolute top-1/2 left-0 w-full h-0.5 bg-white rounded transition-all duration-300 ease-out"
+          style={{
+            transform: isMobileMenuOpen 
+              ? 'translateY(0) rotate(45deg)' 
+              : 'translateY(-10px) rotate(0deg)',
+          }}
         />
         <span
-          ref={middleRef}
-          className="absolute top-1/2 left-0 w-full h-0.5 bg-white rounded -translate-y-1/2"
+          className="absolute top-1/2 left-0 w-full h-0.5 bg-white rounded -translate-y-1/2 transition-opacity duration-200 ease-out"
+          style={{
+            opacity: isMobileMenuOpen ? 0 : 1,
+          }}
         />
         <span
-          ref={bottomRef}
-          className="absolute top-1/2 left-0 w-full h-0.5 bg-white rounded translate-y-2.5"
+          className="absolute top-1/2 left-0 w-full h-0.5 bg-white rounded transition-all duration-300 ease-out"
+          style={{
+            transform: isMobileMenuOpen 
+              ? 'translateY(0) rotate(-45deg)' 
+              : 'translateY(10px) rotate(0deg)',
+          }}
         />
       </button>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-14 left-4 right-4 bg-black rounded-xl flex flex-col gap-2 p-3 shadow-lg">
+        <div className="md:hidden absolute top-14 left-4 right-4 bg-black rounded-xl flex flex-col gap-2 p-3 shadow-lg animate-fade-in">
           {items.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className={`block px-4 py-2 rounded font-medium border-2 transition ${
+              className={`block px-4 py-2 rounded font-medium border-2 transition-all duration-200 ${
                 activeSection === item.href.slice(1)
                   ? "bg-white text-black border-black"
                   : "text-white border-white hover:bg-white hover:text-black"
@@ -169,6 +116,22 @@ const Navbar = ({
           ))}
         </div>
       )}
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.2s ease-out;
+        }
+      `}</style>
     </div>
   );
 };
