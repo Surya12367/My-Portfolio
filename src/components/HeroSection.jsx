@@ -26,9 +26,10 @@ export const HeroSection = () => {
     },
     {
       icon: <FileText size={20} />,
-      href: "#resume",
+      href: "/Portfolio_resume.pdf",
       label: "Resume",
-      color: "hover:bg-purple-500 hover:text-white"
+      color: "hover:bg-purple-500 hover:text-white",
+      download: true
     }
   ];
 
@@ -50,6 +51,7 @@ export const HeroSection = () => {
             href={link.href}
             target={link.href.startsWith('http') ? "_blank" : "_self"}
             rel="noopener noreferrer"
+            download={link.download ? "Surya_Prakash_Resume.pdf" : undefined}
             className={`w-12 h-12 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 
                        flex items-center justify-center text-white transition-all duration-300
                        ${link.color} shadow-lg hover:scale-110 group`}
@@ -116,10 +118,11 @@ export const HeroSection = () => {
             </a>
 
             <a
-              href="#resume"
+              href="/Portfolio_resume.pdf"
+              download="Surya_Prakash_Resume.pdf"
               className="px-6 py-3 rounded-lg bg-transparent border-2 border-purple-500 text-purple-500 font-semibold hover:bg-purple-500 hover:text-white transition shadow-lg hover:shadow-purple-500/50"
             >
-              View Resume
+              Download Resume
             </a>
           </motion.div>
         </div>

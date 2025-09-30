@@ -11,7 +11,7 @@ export const AboutSection = () => {
         {/* Profile Image */}
         <div className="flex-shrink-0">
           <img
-            src="src/assets/portfolio-pic.jpg" // <-- replace with your image path
+            src="src/assets/portfolio-pic.jpg" 
             alt="Profile"
             className="w-90 h-90 object-cover rounded-2xl shadow-lg"
           />
@@ -20,11 +20,11 @@ export const AboutSection = () => {
         {/* Text Content */}
         <div className="flex-1 space-y-6 text-center md:text-left">
           <h2 className="text-3xl md:text-4xl font-bold leading-snug">
-            Full-Stack Developer | React & Spring Boot
+           Full-Stack Developer <span className="bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent"> | React & Spring Boot</span>
           </h2>
 
           <p className="text-lg leading-relaxed">
-            Hi! I'm <span className="font-bold">Surya Prakash</span>, a full-stack
+            Hi! I'm <span className="bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent">Surya Prakash</span>, a full-stack
             developer focused on building scalable and high-performance web
             applications. I specialize in <span className="font-semibold">React.js</span> for frontend
             development and <span className="font-semibold">Spring Boot</span> for backend services.
