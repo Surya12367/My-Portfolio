@@ -1,4 +1,3 @@
-// src/components/ContactSection.jsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, User, MessageSquare, Send, CheckCircle, AlertCircle, MapPin } from 'lucide-react';
@@ -10,6 +9,7 @@ export const ContactSection = () => {
     subject: '',
     message: ''
   });
+  const [errors, setErrors] = useState({});
   const [status, setStatus] = useState({ type: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -18,30 +18,99 @@ export const ContactSection = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Clear error for this field when user starts typing
+    if (errors[e.target.name]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: ''
+      });
+    }
+  };
+
+  const validateForm = () => {
+    let tempErrors = {};
+    let isValid = true;
+
+    if (!formData.name.trim()) {
+      tempErrors.name = "Name is required";
+      isValid = false;
+    }
+
+    if (!formData.email.trim()) {
+      tempErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      tempErrors.email = "Email is invalid";
+      isValid = false;
+    }
+
+    if (!formData.subject.trim()) {
+      tempErrors.subject = "Subject is required";
+      isValid = false;
+    }
+
+    if (!formData.message.trim()) {
+      tempErrors.message = "Message is required";
+      isValid = false;
+    }
+
+    setErrors(tempErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      setStatus({
+        type: 'error',
+        message: 'Please fill in all required fields correctly.'
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     setStatus({ type: '', message: '' });
 
-    // Create mailto link
-    const mailtoLink = `mailto:suryaprakashr193@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-    )}`;
+    // Create a new FormData object to send to Web3Forms API
+    const form = new FormData();
+    form.append("access_key", "51b24ac6-c763-4245-b41e-440c21ccd8b4");
+    form.append("name", formData.name);
+    form.append("email", formData.email);
+    form.append("subject", formData.subject);
+    form.append("message", formData.message);
 
-    // Open mail client
-    window.location.href = mailtoLink;
-
-    // Reset form and show success
-    setTimeout(() => {
-      setStatus({
-        type: 'success',
-        message: 'Mail client opened! Please send the email from your email app.'
+    try {
+      // Send form data to Web3Forms API
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: form,
       });
-      setFormData({ name: '', email: '', subject: '', message: '' });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setStatus({
+          type: 'success',
+          message: 'Message sent successfully!'
+        });
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        setErrors({});
+      } else {
+        setStatus({
+          type: 'error',
+          message: result.message || 'There was an error sending your message.'
+        });
+      }
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: 'An error occurred. Please try again.'
+      });
+      console.error("Error:", error);
+    } finally {
       setIsSubmitting(false);
-    }, 500);
+    }
   };
 
   return (
@@ -111,7 +180,7 @@ export const ContactSection = () => {
                   </div>
                 </div>
 
-                {/* Optional: Add social links here */}
+                {/* Social Links */}
                 <div className="pt-4 sm:pt-6 border-t border-white/10">
                   <p className="text-xs sm:text-sm text-gray-400 mb-3">Connect with me</p>
                   <div className="flex gap-3">
@@ -170,12 +239,21 @@ export const ContactSection = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  required
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-white/5 border border-white/10 
-                           text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                           focus:ring-purple-500 focus:border-transparent transition-all text-sm sm:text-base"
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-white/5 border ${
+                    errors.name ? 'border-red-500' : 'border-white/10'
+                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                           focus:ring-purple-500 focus:border-transparent transition-all text-sm sm:text-base`}
                   placeholder="Your name"
                 />
+                {errors.name && (
+                  <motion.p 
+                    className="text-red-400 text-xs sm:text-sm mt-1"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    {errors.name}
+                  </motion.p>
+                )}
               </div>
 
               {/* Email Input */}
@@ -190,12 +268,21 @@ export const ContactSection = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  required
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-white/5 border border-white/10 
-                           text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                           focus:ring-purple-500 focus:border-transparent transition-all text-sm sm:text-base"
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-white/5 border ${
+                    errors.email ? 'border-red-500' : 'border-white/10'
+                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                           focus:ring-purple-500 focus:border-transparent transition-all text-sm sm:text-base`}
                   placeholder="your.email@example.com"
                 />
+                {errors.email && (
+                  <motion.p 
+                    className="text-red-400 text-xs sm:text-sm mt-1"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    {errors.email}
+                  </motion.p>
+                )}
               </div>
 
               {/* Subject Input */}
@@ -210,12 +297,21 @@ export const ContactSection = () => {
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  required
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-white/5 border border-white/10 
-                           text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                           focus:ring-purple-500 focus:border-transparent transition-all text-sm sm:text-base"
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-white/5 border ${
+                    errors.subject ? 'border-red-500' : 'border-white/10'
+                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                           focus:ring-purple-500 focus:border-transparent transition-all text-sm sm:text-base`}
                   placeholder="What's this about?"
                 />
+                {errors.subject && (
+                  <motion.p 
+                    className="text-red-400 text-xs sm:text-sm mt-1"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    {errors.subject}
+                  </motion.p>
+                )}
               </div>
 
               {/* Message Textarea */}
@@ -229,13 +325,22 @@ export const ContactSection = () => {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  required
                   rows="4"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-white/5 border border-white/10 
-                           text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                           focus:ring-purple-500 focus:border-transparent transition-all resize-none text-sm sm:text-base"
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-white/5 border ${
+                    errors.message ? 'border-red-500' : 'border-white/10'
+                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                           focus:ring-purple-500 focus:border-transparent transition-all resize-none text-sm sm:text-base`}
                   placeholder="Your message here..."
                 />
+                {errors.message && (
+                  <motion.p 
+                    className="text-red-400 text-xs sm:text-sm mt-1"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    {errors.message}
+                  </motion.p>
+                )}
               </div>
 
               {/* Status Message */}
@@ -272,8 +377,8 @@ export const ContactSection = () => {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span className="hidden sm:inline">Opening Mail Client...</span>
-                    <span className="sm:hidden">Opening...</span>
+                    <span className="hidden sm:inline">Sending Message...</span>
+                    <span className="sm:hidden">Sending...</span>
                   </>
                 ) : (
                   <>
